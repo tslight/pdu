@@ -1,6 +1,6 @@
 import argparse
 import os
-from pdu.du import du
+from pdu import du
 
 
 def chkpath(path):
