@@ -5,7 +5,7 @@ with open("README.md", "r") as fh:
 
 setuptools.setup(
     name="pdu",
-    version="0.0.2",
+    version="0.0.3",
     author="Toby Slight",
     author_email="tobyslight@gmail.com",
     description="Python Disk Usage",
