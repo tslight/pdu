@@ -26,20 +26,28 @@ def calc(path):
     '''
     total = 0
     err = None
-    for entry in os.scandir(path):
-        try:
-            is_dir = entry.is_dir(follow_symlinks=False)
-        except:
-            err = "!"
-            break
-        if is_dir:
-            total += calc(entry.path)[0]
-        else:
+    try:
+        for entry in os.scandir(path):
             try:
-                total += entry.stat(follow_symlinks=False).st_size
+                is_dir = entry.is_dir(follow_symlinks=False)
             except:
                 err = "!"
-                break
+                return total, err
+            if is_dir:
+                result = calc(entry.path)
+                total += result[0]
+                err = result[1]
+                if err:
+                    return total, err
+            else:
+                try:
+                    total += entry.stat(follow_symlinks=False).st_size
+                except:
+                    err = "!"
+                    return total, err
+    except:
+        err = "!"
+        return total, err
     return total, err
 
 
@@ -50,7 +58,8 @@ def du(path):
     size, err = calc(path)
     if err:
         return err
-    hr, unit = convert(size)
-    hr = str(hr)
-    result = hr + " " + unit
-    return result
+    else:
+        hr, unit = convert(size)
+        hr = str(hr)
+        result = hr + " " + unit
+        return result
