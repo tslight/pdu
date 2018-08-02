@@ -25,28 +25,32 @@ def calc(path):
     recursively.
     '''
     total = 0
-    if os.path.isdir(path):
-        for entry in os.scandir(path):
+    err = None
+    for entry in os.scandir(path):
+        try:
+            is_dir = entry.is_dir(follow_symlinks=False)
+        except:
+            err = "!"
+            break
+        if is_dir:
+            total += calc(entry.path)[0]
+        else:
             try:
-                if entry.is_dir(follow_symlinks=False):
-                    total += calc(entry.path)[0]
-                else:
-                    total += entry.stat(follow_symlinks=False).st_size
+                total += entry.stat(follow_symlinks=False).st_size
             except:
-                return "!"
-    else:
-        total += os.path.getsize(path)
-    return total
+                err = "!"
+                break
+    return total, err
 
 
 def du(path):
     '''
     Put it all together!
     '''
-    size = calc(path)
-    if isinstance(size, int):
-        hr, unit = convert(size)
-        hr = str(hr)
-        result = hr + " " + unit
-        return result
-    return "!"
+    size, err = calc(path)
+    if err:
+        return err
+    hr, unit = convert(size)
+    hr = str(hr)
+    result = hr + " " + unit
+    return result
