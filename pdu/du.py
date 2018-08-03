@@ -26,28 +26,31 @@ def calc(path):
     '''
     total = 0
     err = None
-    try:
-        for entry in os.scandir(path):
-            try:
-                is_dir = entry.is_dir(follow_symlinks=False)
-            except:
-                err = "!"
-                return total, err
-            if is_dir:
-                result = calc(entry.path)
-                total += result[0]
-                err = result[1]
-                if err:
-                    return total, err
-            else:
+    if os.path.isdir(path):
+        try:
+            for entry in os.scandir(path):
                 try:
-                    total += entry.stat(follow_symlinks=False).st_size
-                except:
+                    is_dir = entry.is_dir(follow_symlinks=False)
+                except PermissionError:
                     err = "!"
                     return total, err
-    except:
-        err = "!"
-        return total, err
+                if is_dir:
+                    result = calc(entry.path)
+                    total += result[0]
+                    err = result[1]
+                    if err:
+                        return total, err
+                else:
+                    try:
+                        total += entry.stat(follow_symlinks=False).st_size
+                    except PermissionError:
+                        err = "!"
+                        return total, err
+        except PermissionError:
+            err = "!"
+            return total, err
+    else:
+        total += os.path.getsize(path)
     return total, err
 
 
