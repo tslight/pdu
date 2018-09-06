@@ -34,7 +34,7 @@ def calc(path):
             for entry in os.scandir(path):
                 try:
                     is_dir = entry.is_dir(follow_symlinks=False)
-                except PermissionError:
+                except (PermissionError, FileNotFoundError):
                     err = "!"
                     return total, err
                 if is_dir:
@@ -46,10 +46,10 @@ def calc(path):
                 else:
                     try:
                         total += entry.stat(follow_symlinks=False).st_size
-                    except PermissionError:
+                    except (PermissionError, FileNotFoundError):
                         err = "!"
                         return total, err
-        except PermissionError:
+        except (PermissionError, FileNotFoundError):
             err = "!"
             return total, err
     else:
